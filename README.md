@@ -1,7 +1,7 @@
 # sms_service
 ## Giltigt sms-format
 En hashtag (#) används som avgränsare i meddelandet:
-**#AAA#BBB#CCC#DDD**
+#AAA#BBB#CCC#DDD
 Där:
 - AAA är avdelningens namn för att hålla koll på om meddelandet är giltigt
 - BBB är lagets/patrullens namn, för att hålla koll på poäng
@@ -48,3 +48,5 @@ clues = {
 	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
 ```
+Exempel på konversation enligt reglerna ovan:
+<img width="709" alt="image" src="https://github.com/NahojBlahoj/sms_service/assets/94386854/bf89f363-6ce8-43ab-8e44-6ddaae306888">
