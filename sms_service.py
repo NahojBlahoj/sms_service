@@ -97,7 +97,6 @@ while True:
 					logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 					myteam.clues += 1
 					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
-
 				elif "answer" in content:
 					question_nbr = content.split(" ")[1]
 					answer = content.split(" ")[2]
@@ -111,7 +110,6 @@ while True:
 						reply = "Wrong answer on question " + str(question_nbr)
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
-
 				else:
 					# Felformaterat men giltigt SMS
 					# TODO svara något? Förlåtande analys av innehållet?
