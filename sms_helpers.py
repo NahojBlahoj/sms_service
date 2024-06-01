@@ -114,7 +114,7 @@ def read_sms():
 				timestamp_human = "20" + str(yymmdd.replace("/","")) + " " + str(hhmmss)
 				#print("From this number: " + number)
 				#print("With this content: " + content)
-				logging.debug("timestamp human: " + timestamp_human)
+				#logging.debug("timestamp human: " + timestamp_human)
 				timestamp = time.strptime(timestamp_human,"%Y%m%d %H:%M:%S")
 				#print(time.strftime("%a %b %d %H:%M:%S %Y", timestamp))
 				timestamp_db = time.mktime(timestamp)
