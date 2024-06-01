@@ -92,7 +92,7 @@ try:
 				logging.debug("Added team " + str(namn) + " to db")
 
 			content = mysms.content.lower().split("#")[4]
-			if "ledtråd" in content:
+			if "clue" in content:
 				clue_nbr = content.split(" ")[1]
 				reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 				sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -100,7 +100,7 @@ try:
 				myteam.clues += 1
 				sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 
-			elif "svar" in content:
+			elif "answer" in content:
 				question_nbr = content.split(" ")[1]
 				answer = content.split(" ")[2]
 				if answer == q_and_a[question_nbr]:
