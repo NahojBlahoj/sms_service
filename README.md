@@ -13,7 +13,7 @@ Hur DDD formateras är valfritt.
 
 
 Deltagardetaljer, exempel
-'''
+```
 avdelningar = ["torn", "finn"]
 lagnamn = ["summus", "araquorna", "clemens", "kastellet"]
 koder = {
@@ -22,28 +22,28 @@ koder = {
 	"clemens" : "domkyrka",
 	"kastellet" : "spinnaker"
 }
-'''
+```
 Frågenummer med respektive svar, exempel
-'''
+```
 q_and_a = {
 	"1" : "1958",
 	"2" : "zlatan",
 	"3" : "Vasa"
 }
-'''
+```
 Antalet poäng på respektive fråga, exempel
-'''
+```
 q_and_points = {
 	"1" : 5,
 	"2" : 1,
 	"3" : 10
 }
-'''
+```
 Ledtrådar till respektive fråga, exempel
-'''
+```
 clues = {
 	"1" : "sverige fick silvermedalj",
 	"2" : "Han var kaxig med bollen",
 	"3" : "Det har sjunkit"
 }
-'''
+```
