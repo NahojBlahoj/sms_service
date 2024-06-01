@@ -98,7 +98,6 @@ try:
 				question_nbr = content.split(" ")[1]
 				answer = content.split(" ")[2]
 				if answer == q_and_a[question_nbr]:
-					# TODO kolla så de inte redan fått poäng för denna fråga
 					myteam.points += q_and_points[question_nbr]
 					reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
