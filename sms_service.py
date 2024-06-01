@@ -7,8 +7,6 @@ import logging
 logger = logging.getLogger(__name__)
 LOGGER_FORMAT = '%(asctime)s  %(message)s'
 logging.basicConfig(filename='/home/johan/logs/sms_service.log', encoding='utf-8', level=logging.DEBUG, format=LOGGER_FORMAT)
-# .debug is used for debugging and in english
-# .info används för tävlingen och är på svenska
 
 # Deltagardetaljer, exempel
 avdelningar = ["torn", "finn"]
@@ -65,7 +63,7 @@ try:
 
 # TODO make while loop here
 
-	sms_helpers.read_sms() # TODO this is time consuming and dependent, move to separate service
+	sms_helpers.read_sms()
 
 	while sms_helpers.get_oldest_invalid_unhandled_sms() > 0:
 		logging.debug("Found an unhandled and invalid sms to check")
@@ -89,14 +87,14 @@ try:
 				logging.debug("Added team " + str(namn) + " to db")
 
 			content = mysms.content.lower().split("#")[4]
-			if "ledtråd" in content:
+			if "clue" in content:
 				clue_nbr = content.split(" ")[1]
 				sms_helpers.send_sms(mysms.number, clues[clue_nbr])
 				logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 				myteam.clues += 1
 				sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 
-			elif "svar" in content:
+			elif "answer" in content:
 				question_nbr = content.split(" ")[1]
 				answer = content.split(" ")[2]
 				if answer == q_and_a[question_nbr]:
