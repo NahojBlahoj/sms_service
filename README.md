@@ -28,7 +28,8 @@ Frågenummer med respektive svar, exempel
 q_and_a = {
 	"1" : "1958",
 	"2" : "zlatan",
-	"3" : "Vasa"
+	"3" : "vasa",
+	"4" : "gryta"
 }
 ```
 Antalet poäng på respektive fråga, exempel
@@ -36,14 +37,16 @@ Antalet poäng på respektive fråga, exempel
 q_and_points = {
 	"1" : 5,
 	"2" : 1,
-	"3" : 10
+	"3" : 10,
+	"4" : 7
 }
 ```
 Ledtrådar till respektive fråga, exempel
 ```
 clues = {
-	"1" : "sverige fick silvermedalj",
-	"2" : "Han var kaxig med bollen",
-	"3" : "Det har sjunkit"
+	"1" : "Sweden got a silver medal",
+	"2" : "He is cocky on the grass",
+	"3" : "It has sunk",
+	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
 ```
