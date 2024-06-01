@@ -61,71 +61,68 @@ logging.debug("Creating databases if not already done")
 sms_helpers.create_sms_database()
 sms_helpers.create_teams_database()
 
-logging.debug("---- Starting main loop----")
+logging.debug("---- Starting sms service ----")
 
 locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
-try:
+while True:
+	try:
+		sms_helpers.read_sms()
 
-# TODO make while loop here
+		while sms_helpers.get_oldest_invalid_unhandled_sms() > 0:
+			logging.debug("Found an unhandled and invalid sms to check")
+			check_sms_validity(sms_helpers.get_oldest_invalid_unhandled_sms())
+		logging.debug("No invalid and unhandled sms in db")
 
-	sms_helpers.read_sms()
+		while sms_helpers.get_oldest_valid_unhandled_sms() > 0:
+			mysms = sms_helpers.get_sms_by_id(sms_helpers.get_oldest_valid_unhandled_sms())
+			avdelning = mysms.content.lower().split("#")[1]
+			namn = mysms.content.lower().split("#")[2]
+			kod = mysms.content.lower().split("#")[3]
+			logging.debug("nummer: " + str(mysms.number) + ", avdelning: " + str(avdelning + ", namn: " + str(namn) + ", kod: " + str(kod)))
+			if koder[namn] == kod:
+				logging.debug("SMS with correct code recieved")
+				try:
+					myteam = sms_helpers.get_team_from_db(avdelning, namn, kod)
+				except:
+					# Laget finns inte, lägg till det i databasen
+					sms_helpers.add_team_to_db(avdelning, namn, kod, 0, 0)
+					myteam = sms_helpers.get_team_from_db(avdelning, namn, kod)
+					logging.debug("Added team " + str(namn) + " to db")
 
-	while sms_helpers.get_oldest_invalid_unhandled_sms() > 0:
-		logging.debug("Found an unhandled and invalid sms to check")
-		check_sms_validity(sms_helpers.get_oldest_invalid_unhandled_sms())
-	logging.debug("No invalid and unhandled sms in db")
-
-	while sms_helpers.get_oldest_valid_unhandled_sms() > 0:
-		mysms = sms_helpers.get_sms_by_id(sms_helpers.get_oldest_valid_unhandled_sms())
-		avdelning = mysms.content.lower().split("#")[1]
-		namn = mysms.content.lower().split("#")[2]
-		kod = mysms.content.lower().split("#")[3]
-		logging.debug("nummer: " + str(mysms.number) + ", avdelning: " + str(avdelning + ", namn: " + str(namn) + ", kod: " + str(kod)))
-		if koder[namn] == kod:
-			logging.debug("SMS with correct code recieved")
-			try:
-				myteam = sms_helpers.get_team_from_db(avdelning, namn, kod)
-			except:
-				# Laget finns inte, lägg till det i databasen
-				sms_helpers.add_team_to_db(avdelning, namn, kod, 0, 0)
-				myteam = sms_helpers.get_team_from_db(avdelning, namn, kod)
-				logging.debug("Added team " + str(namn) + " to db")
-
-			content = mysms.content.lower().split("#")[4]
-			if "clue" in content:
-				clue_nbr = content.split(" ")[1]
-				reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
-				sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-				logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
-				myteam.clues += 1
-				sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
-
-			elif "answer" in content:
-				question_nbr = content.split(" ")[1]
-				answer = content.split(" ")[2]
-				if answer == q_and_a[question_nbr]:
-					myteam.points += q_and_points[question_nbr]
-					reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+				content = mysms.content.lower().split("#")[4]
+				if "clue" in content:
+					clue_nbr = content.split(" ")[1]
+					reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
+					logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
+					myteam.clues += 1
+					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
+				elif "answer" in content:
+					question_nbr = content.split(" ")[1]
+					answer = content.split(" ")[2]
+					if answer == q_and_a[question_nbr]:
+						myteam.points += q_and_points[question_nbr]
+						reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
+					else:
+						logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
+						reply = "Wrong answer on question " + str(question_nbr)
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 				else:
-					logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
-					reply = "Wrong answer on question " + str(question_nbr)
-					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-				sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
-
+					# Felformaterat men giltigt SMS
+					# TODO svara något? Förlåtande analys av innehållet?
+					logging.info("Giltigt SMS men felformaterat. Nummer: " + str(mysms.number) + " och innehåll: " + str(mysms.content))
+					sms_helpers.invalidate_to_db(mysms.id)
+				sms_helpers.handled_to_db(mysms.id)
 			else:
-				# Felformaterat men giltigt SMS
-				# TODO svara något? Förlåtande analys av innehållet?
-				logging.info("Giltigt SMS men felformaterat. Nummer: " + str(mysms.number) + " och innehåll: " + str(mysms.content))
+				logging.info("Meddelande med fel kod skickad (fusk?). Nummer: " + str(mysms.number) + "meddelande: " + str(mysms.content))
 				sms_helpers.invalidate_to_db(mysms.id)
-			sms_helpers.handled_to_db(mysms.id)
-		else:
-			logging.info("Meddelande med fel kod skickad (fusk?). Nummer: " + str(mysms.number) + "meddelande: " + str(mysms.content))
-			sms_helpers.invalidate_to_db(mysms.id)
-			sms_helpers.handled_to_db(mysms.id)
-except Exception as e:
-	logger.exception(e)
-finally:
-	logger.debug("Ending sms_service")
+				sms_helpers.handled_to_db(mysms.id)
+		time.sleep(5)
+	except Exception as e:
+			logger.exception(e)
+	finally:
+			logger.debug("---- Looping sms_service ----")
 
