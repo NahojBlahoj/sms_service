@@ -49,4 +49,4 @@ clues = {
 }
 ```
 Exempel på konversation enligt reglerna ovan:
-<img width="709" alt="image" src="https://github.com/NahojBlahoj/sms_service/assets/94386854/bf89f363-6ce8-43ab-8e44-6ddaae306888">
+<img width="709" alt="image" src="https://github.com/NahojBlahoj/sms_service/assets/94386854/c26757db-59da-4cce-ae44-bc540ed1ac40">
