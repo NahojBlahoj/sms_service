@@ -5,6 +5,7 @@ except:
 import time
 import sqlite3
 import logging
+import locale
 
 _SMSDATABASE = "/home/johan/code/sms_service/sms.db"
 _TEAMDATABASE = "/home/johan/code/sms_service/teams.db"
@@ -21,23 +22,24 @@ def _send_at(command, back, timeout):
 		port.write((command + "\r\n").encode())
 		time.sleep(timeout)
 	except Exception as e:
-		logging.error("    send_at failed with: " + str(e))
+		logging.error("    send_at outbound failed with: " + str(e))
 	if port.inWaiting:
 		time.sleep(0.01)
 		rec_buff = port.read(port.inWaiting())
+		#logging.debug("rec_buff decoded: " + rec_buff.decode('unicode_escape'))
 	try:
-		if back not in rec_buff.decode():
-			logging.error("    Error with command: " + command + ". Got back: " + str(rec_buff.decode().replace("\n",".").replace("\r",".")))
+		if back not in rec_buff.decode('unicode_escape'):
+			logging.error("    Error with command: " + command + ". Got back: " + str(rec_buff.decode('unicode_escape').replace("\n",".").replace("\r",".")))
 			port.reset_input_buffer()
 			port.close()
 			return 0
 		else:
-			logging.debug("    Recieved: " + str(rec_buff.decode().replace("\n", ".").replace("\r",".")))
+			logging.debug("    Recieved: " + str(rec_buff.decode('unicode_escape').replace("\n", ",").replace("\r",",")))
 			port.reset_input_buffer()
 			port.close()
-			return str(rec_buff.decode())
+			return str(rec_buff.decode('unicode_escape').replace("\n",",").replace("\r",","))
 	except Exception as e:
-		logging.error("    send_at failed with: " + str(e))
+		logging.error("    send_at inbound failed with: " + str(e))
 		port.reset_input_buffer()
 		port.close()
 		return 0
@@ -50,22 +52,27 @@ def send_sms(phone_number, text_message):
 	answer = _send_at("AT+CMGF=1","OK",3)
 	answer = _send_at("AT+CMGS=\"" + phone_number + "\"",">",4)
 	port = serial.Serial(_PORT, _SPEED)
+	port.reset_input_buffer()
+	port.reset_output_buffer()
+	# logging.debug("Sending this text message: " + str(text_message.decode()))
 	if answer != 0:
 		port.write(text_message)
 		port.write(b"\x1A")
 		time.sleep(5)
 		answer = _send_at("","",5)
 		if answer != 0:
-			logging.info("  SMS sent ok")
+			logging.info("   SMS sent ok")
 			port.close()
 			return True
 		else:
-			logging.error("  SMS not sent within timeout!")
+			logging.error("   SMS not sent within timeout!")
 			port.close()
 			return False
 	else:
-		logging.error("  CMGS error")
+		logging.error("   CMGS error")
 		port.write(b"\x1A")
+		port.reset_input_buffer()
+		port.reset_output_buffer()
 		port.close()
 		return False
 
@@ -107,7 +114,7 @@ def read_sms():
 				timestamp_human = "20" + str(yymmdd.replace("/","")) + " " + str(hhmmss)
 				#print("From this number: " + number)
 				#print("With this content: " + content)
-				#print("timestamp human: " + timestamp_human)
+				logging.debug("timestamp human: " + timestamp_human)
 				timestamp = time.strptime(timestamp_human,"%Y%m%d %H:%M:%S")
 				#print(time.strftime("%a %b %d %H:%M:%S %Y", timestamp))
 				timestamp_db = time.mktime(timestamp)

@@ -3,9 +3,10 @@
 import time
 import sms_helpers
 import logging
+import locale
 
 logger = logging.getLogger(__name__)
-LOGGER_FORMAT = '%(asctime)s  %(message)s'
+LOGGER_FORMAT = "%(asctime)s  %(message)s"
 logging.basicConfig(filename='/home/johan/logs/sms_service.log', encoding='utf-8', level=logging.DEBUG, format=LOGGER_FORMAT)
 
 # Deltagardetaljer, exempel
@@ -21,19 +22,22 @@ koder = {
 q_and_a = {
 	"1" : "1958",
 	"2" : "zlatan",
-	"3" : "vasa"
+	"3" : "vasa",
+	"4" : "gryta"
 }
 # Antalet poäng på respektive fråga, exempel
 q_and_points = {
 	"1" : 5,
 	"2" : 1,
-	"3" : 10
+	"3" : 10,
+	"4" : 7
 }
 # Ledtrådar till respektive fråga
 clues = {
-	"1" : "sverige fick silvermedalj",
-	"2" : "Han var kaxig med bollen",
-	"3" : "Det har sjunkit"
+	"1" : "Sweden got a silver medal",
+	"2" : "He is cocky on the grass",
+	"3" : "It has sunk",
+	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
 
 def check_sms_validity(id):
@@ -59,6 +63,7 @@ sms_helpers.create_teams_database()
 
 logging.debug("---- Starting main loop----")
 
+locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
 try:
 
 # TODO make while loop here
@@ -69,13 +74,13 @@ try:
 		logging.debug("Found an unhandled and invalid sms to check")
 		check_sms_validity(sms_helpers.get_oldest_invalid_unhandled_sms())
 	logging.debug("No invalid and unhandled sms in db")
-	
+
 	while sms_helpers.get_oldest_valid_unhandled_sms() > 0:
 		mysms = sms_helpers.get_sms_by_id(sms_helpers.get_oldest_valid_unhandled_sms())
 		avdelning = mysms.content.lower().split("#")[1]
 		namn = mysms.content.lower().split("#")[2]
 		kod = mysms.content.lower().split("#")[3]
-		logging.debug("avdelning: " + str(avdelning + ", namn: " + str(namn) + ", kod: " + str(kod)))
+		logging.debug("nummer: " + str(mysms.number) + ", avdelning: " + str(avdelning + ", namn: " + str(namn) + ", kod: " + str(kod)))
 		if koder[namn] == kod:
 			logging.debug("SMS with correct code recieved")
 			try:
@@ -87,14 +92,15 @@ try:
 				logging.debug("Added team " + str(namn) + " to db")
 
 			content = mysms.content.lower().split("#")[4]
-			if "clue" in content:
+			if "ledtråd" in content:
 				clue_nbr = content.split(" ")[1]
-				sms_helpers.send_sms(mysms.number, clues[clue_nbr])
+				reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
+				sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 				myteam.clues += 1
 				sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 
-			elif "answer" in content:
+			elif "svar" in content:
 				question_nbr = content.split(" ")[1]
 				answer = content.split(" ")[2]
 				if answer == q_and_a[question_nbr]:
