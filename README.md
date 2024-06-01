@@ -9,8 +9,6 @@ Där:
 - DDD är t.ex. "ledtråd 1" eller "svar 6 97" om de vill ha ledtråd till fråga 1 resp.
 		om de vill skicka in svaret 97 på fråga 6
 
-Hur DDD formateras är valfritt.
-
 
 Deltagardetaljer, exempel
 ```
