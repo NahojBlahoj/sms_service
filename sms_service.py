@@ -121,6 +121,9 @@ while True:
 						reply = "Wrong answer on question " + str(question_nbr)
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
+				elif "leaderboard" in content:
+					reply = sms_helpers.get_top_three(avdelning)
+					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				else:
 					# Felformaterat men giltigt SMS
 					# TODO svara något? Förlåtande analys av innehållet?
@@ -133,7 +136,7 @@ while True:
 				sms_helpers.handled_to_db(mysms.id)
 		time.sleep(5)
 	except Exception as e:
-			logger.exception(e)
+			logging.exception(e)
 	finally:
-			logger.debug("---- Looping sms_service ----")
+			logging.debug("---- Looping sms_service ----")
 
