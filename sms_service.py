@@ -5,9 +5,18 @@ import sms_helpers
 import logging
 import locale
 
-logger = logging.getLogger(__name__)
-LOGGER_FORMAT = "%(asctime)s  %(message)s"
-logging.basicConfig(filename='/home/johan/logs/sms_service.log', encoding='utf-8', level=logging.DEBUG, format=LOGGER_FORMAT)
+import logging.handlers
+
+def log_setup():
+    log_handler = logging.handlers.WatchedFileHandler('/home/johan/logs/sms_service.log')
+    formatter = logging.Formatter(
+        '%(asctime)s sms_service [%(process)d]: %(message)s',
+        '%b %d %H:%M:%S')
+    #formatter.converter = time.gmtime  # if you want UTC time
+    log_handler.setFormatter(formatter)
+    logger = logging.getLogger()
+    logger.addHandler(log_handler)
+    logger.setLevel(logging.DEBUG)
 
 # Deltagardetaljer, exempel
 avdelningar = ["torn", "finn"]
@@ -39,6 +48,8 @@ clues = {
 	"3" : "It has sunk",
 	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
+
+log_setup()
 
 def check_sms_validity(id):
 	# Checks if an sms is valid
