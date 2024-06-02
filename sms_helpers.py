@@ -283,3 +283,19 @@ def get_team_from_db(avdelning, namn, kod):
 	connection.close()
 	ret_team = team(avdelning=data[0], namn=data[1], kod=data[2], points=data[3], clues=data[4])
 	return ret_team
+
+def get_top_three(avdelning):
+	connection = sqlite3.connect(_TEAMDATABASE)
+	cursor = connection.cursor()
+	cursor.execute("SELECT * FROM teams WHERE avdelning=? ORDER BY points DESC LIMIT 3",(avdelning,))
+	data = cursor.fetchall()
+	cursor.close()
+	connection.close()
+	retval = ""
+	try:
+		retval = retval +  "1: " + str(data[0][1]) + ". "
+		retval = retval +  "2: " + str(data[1][1]) + ". "
+		retval = retval +  "3: " + str(data[2][1]) + "."
+	except:
+		pass
+	return retval
