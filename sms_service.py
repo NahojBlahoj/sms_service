@@ -103,15 +103,22 @@ while True:
 				content = mysms.content.lower().split("#")[4]
 				if "clue" in content:
 					clue_nbr = content.split(" ")[1]
-					reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
-					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
-					myteam.clues += 1
-					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
+					if int(clue_nbr) < 1 or int(clue_nbr) > int(list(clues.keys())[-1]):
+						reply = "No such clue"
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					else:
+						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
+						myteam.clues += 1
+						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 				elif "answer" in content:
 					question_nbr = content.split(" ")[1]
 					answer = content.split(" ")[2]
-					if answer == q_and_a[question_nbr]:
+					if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
+						reply = "No such question"
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif answer == q_and_a[question_nbr]:
 						myteam.points += q_and_points[question_nbr]
 						reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -133,7 +140,7 @@ while True:
 				sms_helpers.handled_to_db(mysms.id)
 		time.sleep(5)
 	except Exception as e:
-			logger.exception(e)
+			logging.exception(e)
 	finally:
-			logger.debug("---- Looping sms_service ----")
+			logging.debug("---- Looping sms_service ----")
 
