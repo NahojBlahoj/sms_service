@@ -6,8 +6,9 @@ Där:
 - AAA är avdelningens namn för att hålla koll på om meddelandet är giltigt
 - BBB är lagets/patrullens namn, för att hålla koll på poäng
 - CCC är en hemlig kod som bara patrullen känner till så inga andra kan missbruka lag/patrullnamnet
-- DDD är t.ex. "ledtråd 1" eller "svar 6 97" om de vill ha ledtråd till fråga 1 resp.
-		om de vill skicka in svaret 97 på fråga 6
+- DDD är t.ex. "clue 1" eller "answer 6 97" om de vill ha ledtråd till fråga 1 resp.
+		om de vill skicka in svaret 97 på fråga 6.
+        Fler DDD är t.ex. "leaderboard" för att få veta topp tre och "question 2" för att få veta fråga 2
 
 
 Deltagardetaljer, exempel
