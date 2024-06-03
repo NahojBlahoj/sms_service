@@ -27,6 +27,14 @@ koder = {
 	"clemens" : "domkyrka",
 	"kastellet" : "spinnaker"
 }
+# Frågor, exempel
+questions = {
+	"1" : "When did the first IKEA warehouse open?",
+	"2" : "Ajax-Juventus-Milan-Barcelona",
+	"3" : "Bread and Boat",
+	"4" : "Made for cooking"
+}
+
 # Frågenummer med respektive svar, exempel
 q_and_a = {
 	"1" : "1958",
@@ -123,6 +131,10 @@ while True:
 					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
 				elif "leaderboard" in content:
 					reply = sms_helpers.get_top_three(avdelning)
+					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+				elif "question" in content:
+					question_nbr = content.split(" ")[1]
+					reply = "Question number " + str(question_nbr) + " is " + questions[question_nbr]
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				else:
 					# Felformaterat men giltigt SMS
