@@ -21,6 +21,15 @@ koder = {
 	"kastellet" : "spinnaker"
 }
 ```
+Frågor, exempel
+```
+questions = {
+	"1" : "When did the first IKEA warehouse open?",
+	"2" : "Ajax-Juventus-Milan-Barcelona",
+	"3" : "Bread and Boat",
+	"4" : "Made for cooking"
+}
+```
 Frågenummer med respektive svar, exempel
 ```
 q_and_a = {
