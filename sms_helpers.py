@@ -268,7 +268,7 @@ def handled_to_db(id):
 def add_team_to_db(avdelning="", namn="", kod="", points=0, clues=0, correct="00000000000000000000"):
 	connection = sqlite3.connect(_TEAMDATABASE)
 	cursor = connection.cursor()
-	cursor.execute("INSERT INTO teams VALUES (?, ?, ?, ?, ?)",(avdelning, namn, kod, points, clues, correct))
+	cursor.execute("INSERT INTO teams VALUES (?, ?, ?, ?, ?, ?)",(avdelning, namn, kod, points, clues, correct))
 	cursor.close()
 	connection.commit()
 	connection.close()
@@ -288,7 +288,11 @@ def get_team_from_db(avdelning, namn, kod):
 	connection = sqlite3.connect(_TEAMDATABASE)
 	cursor = connection.cursor()
 	cursor.execute("SELECT * FROM teams WHERE avdelning=? AND namn=? AND kod=?",(avdelning, namn, kod))
-	data = cursor.fetchall()[0]
+	try:
+		data = cursor.fetchall()[0]
+	except:
+		logging.error("Team {} not found in database".format(namn))
+		raise Exception
 	cursor.close()
 	connection.close()
 	ret_team = team(avdelning=data[0], namn=data[1], kod=data[2], points=data[3], clues=data[4], correct=data[5])

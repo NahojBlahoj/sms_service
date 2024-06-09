@@ -111,12 +111,12 @@ while True:
 						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					elif answer == q_and_a[question_nbr]:
-						if myteam.correct[question_nbr] > 0:
+						if int(myteam.correct[int(question_nbr)]) > 0:
 							reply = "You have already answered question {}".format(question_nbr)
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 						else:
 							myteam.points += q_and_points[question_nbr]
-							myteam.correct[question_nbr] = 1 
+							myteam.correct = myteam.correct[:int(question_nbr)] + "1" + myteam.correct[int(question_nbr)+1:] 
 							reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 							logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
