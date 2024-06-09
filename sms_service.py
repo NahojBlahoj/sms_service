@@ -12,6 +12,8 @@ avdelningar = competition.avdelningar
 lagnamn = competition.lagnamn
 koder = competition.koder
 questions = competition.questions
+q_start = competition.q_start
+q_stop = competition.q_stop
 q_and_a = competition.q_and_a
 q_and_points = competition.q_and_points
 clues = competition.clues
@@ -84,6 +86,12 @@ while True:
 					if int(clue_nbr) < 1 or int(clue_nbr) > int(list(clues.keys())[-1]):
 						reply = "No such clue"
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() < int(time.mktime(time.strptime(q_start[clue_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} opens at {}".format(clue_nbr, q_start[clue_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() > int(time.mktime(time.strptime(q_stop[clue_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} is closed since {}".format(clue_nbr, q_stop[clue_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					else:
 						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -95,6 +103,12 @@ while True:
 					answer = content.split(" ")[2]
 					if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
 						reply = "No such question"
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					elif answer == q_and_a[question_nbr]:
 						myteam.points += q_and_points[question_nbr]
@@ -111,8 +125,18 @@ while True:
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				elif "question" in content:
 					question_nbr = content.split(" ")[1]
-					reply = "Question number " + str(question_nbr) + " is " + questions[question_nbr]
-					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
+						reply = "No such question"
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
+						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					else:
+						reply = "Question number " + str(question_nbr) + " is " + questions[question_nbr]
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				else:
 					# Felformaterat men giltigt SMS
 					# TODO svara något? Förlåtande analys av innehållet?

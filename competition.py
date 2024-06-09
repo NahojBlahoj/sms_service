@@ -7,6 +7,7 @@ koder = {
 	"clemens" : "domkyrka",
 	"kastellet" : "spinnaker"
 }
+
 # Frågor, exempel
 questions = {
 	"1" : "When did the first IKEA warehouse open?",
@@ -22,6 +23,22 @@ q_and_a = {
 	"3" : "vasa",
 	"4" : "gryta"
 }
+# Starttid för respektive fråga
+q_start = {
+    "1" : "2024-07-09 09:00",
+    "2" : "2024-06-09 10:00",
+    "3" : "2024-06-09 11:00",
+    "4" : "2024-06-09 12:00"
+}
+
+# Sluttid för respektive fråga
+q_stop = {
+    "1" : "2024-06-09 10:00",
+    "2" : "2024-06-09 11:00",
+    "3" : "2024-06-09 12:00",
+    "4" : "2024-05-09 13:00"
+}
+
 # Antalet poäng på respektive fråga, exempel
 q_and_points = {
 	"1" : 5,
