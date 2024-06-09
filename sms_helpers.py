@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 def _send_at(command, back, timeout):
 	rec_buff = ""
-	port = serial.Serial(_PORT, _SPEED)
+	try:
+		port = serial.Serial(_PORT, _SPEED)
+	except:
+		logging.error("Unable top open serial port in _send_at")
+		return 0
 	port.reset_input_buffer()
 	try:
 		logging.debug("    Sending this AT command: " + command)
