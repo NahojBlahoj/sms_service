@@ -169,6 +169,17 @@ def create_teams_database():
 	cursor.close()
 	connection.close()
 
+def reset_teams_database():
+	connection = sqlite3.connect(_TEAMDATABASE)
+	cursor = connection.cursor()
+	try:
+		cursor.execute("DROP TABLE IF EXISTS teams")
+	except:
+		logging.error("Unable to reset team database")
+	logging.info("Team database reset")
+	cursor.close()
+	connection.close()
+
 class sms:
 	def __init__(self, id=0, number="", content="", timestamp=0, handled=False, valid=False):
 		self.id = id
