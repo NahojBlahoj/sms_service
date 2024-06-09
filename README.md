@@ -22,7 +22,7 @@ koder = {
 	"kastellet" : "spinnaker"
 }
 ```
-Frågor, exempel
+Frågor, exempel. Maxantalet är 20 (men går att ändra)
 ```
 questions = {
 	"1" : "When did the first IKEA warehouse open?",

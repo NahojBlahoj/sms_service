@@ -97,7 +97,7 @@ while True:
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 						myteam.clues += 1
-						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
+						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
 				elif "answer" in content:
 					question_nbr = content.split(" ")[1]
 					answer = content.split(" ")[2]
@@ -111,15 +111,20 @@ while True:
 						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					elif answer == q_and_a[question_nbr]:
-						myteam.points += q_and_points[question_nbr]
-						reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-						logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
+						if int(myteam.correct[int(question_nbr)]) > 0:
+							reply = "You have already answered question {}".format(question_nbr)
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						else:
+							myteam.points += q_and_points[question_nbr]
+							myteam.correct = myteam.correct[:int(question_nbr)] + "1" + myteam.correct[int(question_nbr)+1:] 
+							reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+							logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
 					else:
 						logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
 						reply = "Wrong answer on question " + str(question_nbr)
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues)
+					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
 				elif "leaderboard" in content:
 					reply = sms_helpers.get_top_three(avdelning)
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -135,7 +140,7 @@ while True:
 						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					else:
-						reply = "Question number " + str(question_nbr) + " is " + questions[question_nbr]
+						reply = "Question number " + str(question_nbr) + " is: " + questions[question_nbr]
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				else:
 					# Felformaterat men giltigt SMS
