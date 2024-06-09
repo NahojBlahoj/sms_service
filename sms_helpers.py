@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 def _send_at(command, back, timeout):
 	rec_buff = ""
-	port = serial.Serial(_PORT, _SPEED)
+	try:
+		port = serial.Serial(_PORT, _SPEED)
+	except:
+		logging.error("Unable top open serial port in _send_at")
+		return 0
 	port.reset_input_buffer()
 	try:
 		logging.debug("    Sending this AT command: " + command)
@@ -51,7 +55,11 @@ def reset_modem():
 def send_sms(phone_number, text_message):
 	answer = _send_at("AT+CMGF=1","OK",3)
 	answer = _send_at("AT+CMGS=\"" + phone_number + "\"",">",4)
-	port = serial.Serial(_PORT, _SPEED)
+	try:
+		port = serial.Serial(_PORT, _SPEED)
+	except:
+		logging.error("Unable to open serial port in send_sms")
+		return False
 	port.reset_input_buffer()
 	port.reset_output_buffer()
 	# logging.debug("Sending this text message: " + str(text_message.decode()))
