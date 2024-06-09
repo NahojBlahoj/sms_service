@@ -8,7 +8,7 @@ koder = {
 	"kastellet" : "spinnaker"
 }
 
-# Frågor, exempel
+# Frågor, exempel. Maxantalet är 20 (men går att ändra)
 questions = {
 	"1" : "When did the first IKEA warehouse open?",
 	"2" : "Ajax-Juventus-Milan-Barcelona",
@@ -25,7 +25,7 @@ q_and_a = {
 }
 # Starttid för respektive fråga
 q_start = {
-    "1" : "2024-07-09 09:00",
+    "1" : "2024-06-09 09:00",
     "2" : "2024-06-09 10:00",
     "3" : "2024-06-09 11:00",
     "4" : "2024-06-09 12:00"
@@ -33,10 +33,10 @@ q_start = {
 
 # Sluttid för respektive fråga
 q_stop = {
-    "1" : "2024-06-09 10:00",
-    "2" : "2024-06-09 11:00",
-    "3" : "2024-06-09 12:00",
-    "4" : "2024-05-09 13:00"
+    "1" : "2024-07-10 10:00",
+    "2" : "2024-06-20 11:00",
+    "3" : "2024-06-20 12:00",
+    "4" : "2024-05-20 13:00"
 }
 
 # Antalet poäng på respektive fråga, exempel
