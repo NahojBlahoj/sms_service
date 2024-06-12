@@ -10,6 +10,27 @@ Där:
 		om de vill skicka in svaret 97 på fråga 6.
         Fler DDD är t.ex. "leaderboard" för att få veta topp tre och "question 2" för att få veta fråga 2
 
+Typen av tävling är någon av dessa:
+- Open - Alla frågorna är öppna
+- Sequential - nästa fråga låses upp när nuvarande frågan är besvarad korrekt
+- Timed - Frågorna öppnas och stängs med vissa tidsintervall
+```
+# Starttid för respektive fråga
+q_start = {
+    "1" : "2024-06-09 09:00",
+    "2" : "2024-06-09 10:00",
+    "3" : "2024-06-09 11:00",
+    "4" : "2024-06-09 12:00"
+}
+
+# Sluttid för respektive fråga
+q_stop = {
+    "1" : "2024-07-10 10:00",
+    "2" : "2024-06-20 11:00",
+    "3" : "2024-06-20 12:00",
+    "4" : "2024-05-20 13:00"
+}
+```
 
 Deltagardetaljer, exempel
 ```
