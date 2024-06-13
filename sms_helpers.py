@@ -151,19 +151,20 @@ def get_sms_by_id(id):
 	return ret_sms
 
 class team():
-	def __init__(self, avdelning="", namn="", kod="", points=0, clues=0, correct="00000000000000000000"):
+	def __init__(self, avdelning="", namn="", kod="", points=0, clues=0, correct="00000000000000000000", progress=0):
 		self.avdelning = avdelning
 		self.namn = namn
 		self.kod = kod
 		self.points = points
 		self.clues = clues
-		self.correct = correct
+		self.correct = correct # List of 1 and 0 depending on correct or not on that question
+		self.progress = progress # How many question has been answered
 
 def create_teams_database():
 	connection = sqlite3.connect(_TEAMDATABASE)
 	cursor = connection.cursor()
 	try:
-		cursor.execute("CREATE TABLE IF NOT EXISTS teams (avdelning TEXT, namn TEXT, kod TEXT, points INTEGER, clues INTEGER, correct TEXT)")
+		cursor.execute("CREATE TABLE IF NOT EXISTS teams (avdelning TEXT, namn TEXT, kod TEXT, points INTEGER, clues INTEGER, correct TEXT, progress INTEGER)")
 	except:
 		logging.info("Team Database table already created")
 	cursor.close()
@@ -276,20 +277,21 @@ def handled_to_db(id):
 	connection.commit()
 	connection.close()
 
-def add_team_to_db(avdelning="", namn="", kod="", points=0, clues=0, correct="00000000000000000000"):
+def add_team_to_db(avdelning="", namn="", kod="", points=0, clues=0, correct="00000000000000000000", progress=0):
 	connection = sqlite3.connect(_TEAMDATABASE)
 	cursor = connection.cursor()
-	cursor.execute("INSERT INTO teams VALUES (?, ?, ?, ?, ?, ?)",(avdelning, namn, kod, points, clues, correct))
+	cursor.execute("INSERT INTO teams VALUES (?, ?, ?, ?, ?, ?, ?)",(avdelning, namn, kod, points, clues, correct, progress))
 	cursor.close()
 	connection.commit()
 	connection.close()
 
-def save_team_progress_to_db(namn, points, clues, correct):
+def save_team_progress_to_db(namn, points, clues, correct, progress):
 	connection = sqlite3.connect(_TEAMDATABASE)
 	cursor = connection.cursor()
 	cursor.execute("UPDATE teams SET points=? WHERE namn=?",(points,namn))
 	cursor.execute("UPDATE teams SET clues=? WHERE namn=?",(clues,namn))
 	cursor.execute("UPDATE teams SET correct=? WHERE namn=?",(correct,namn))
+	cursor.execute("UPDATE teams SET progress=? WHERE namn=?",(progress,namn))
 	cursor.fetchall()
 	cursor.close()
 	connection.commit()

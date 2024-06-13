@@ -8,6 +8,14 @@ koder = {
 	"kastellet" : "spinnaker"
 }
 
+# Typen av tävling är någon av dessa:
+# Sequential - nästa fråga låses upp när förra frågan är besvarad korrekt
+# Timed - Frågorna öppnas och stängs med vissa tidsintervall
+# Open - Alla frågorna är öppna
+type = "sequential"
+# type = "timed"
+# type = "open"
+
 # Frågor, exempel. Maxantalet är 20 (men går att ändra)
 questions = {
 	"1" : "When did the first IKEA warehouse open?",
