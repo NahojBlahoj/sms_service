@@ -93,19 +93,20 @@ while True:
 					elif competition_type == "timed" and int(time.time() > int(time.mktime(time.strptime(q_stop[clue_nbr],"%Y-%m-%d %H:%M")))):
 						reply = "Question {} is closed since {}".format(clue_nbr, q_stop[clue_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif competition_type == "open":
+					elif competition_type == "open" or competition_type == "timed":
 						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 						myteam.clues += 1
-						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct, myteam.progress)
 					elif competition_type == "sequential":
+						# TODO verify this code
 						if int(clue_nbr) == 1:
 							reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 							logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 							myteam.clues += 1
-							sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+							sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct, myteam.progress)
 						elif int(myteam.correct[int(clue_nbr)-1]) > 0:
 							reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -125,25 +126,27 @@ while True:
 					elif competition_type == "timed" and int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
 						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif competition_type == "open" and answer == q_and_a[question_nbr]:
+					elif (competition_type == "timed" or competition_type == "open") and answer == q_and_a[question_nbr]:
 						if int(myteam.correct[int(question_nbr)]) > 0:
 							reply = "You have already answered question {}".format(question_nbr)
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 						else:
 							myteam.points += q_and_points[question_nbr]
 							myteam.correct = myteam.correct[:int(question_nbr)] + "1" + myteam.correct[int(question_nbr)+1:] 
-							if competition_type == "sequential":
-								reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
-								reply = reply +  + ". Question " + str(question_nbr+1) + " is now open."
-							else:
-								reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+							myteam.progress = myteam.progress + 1
+							reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 							logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
+					elif competition_type == "sequential" and answer == q_and_a[question_nbr]:
+						# TODO
+						# Next question should open even if the answer is wrong?
+						pass
 					else:
 						logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
 						reply = "Wrong answer on question " + str(question_nbr)
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+						myteam.progress = myteam.progress + 1 # A team can progress even if it answers wrong
+					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct, myteam.progress)
 				elif "leaderboard" in content:
 					reply = sms_helpers.get_top_three(avdelning)
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
@@ -158,10 +161,11 @@ while True:
 					elif competition_type == "timed" and int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
 						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif competition_type == "open":
+					elif competition_type == "timed" or competition_type == "open":
 						reply = "Question number " + str(question_nbr) + " is: " + questions[question_nbr]
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))						
 					elif competition_type == "sequential":
+						# TODO check this code
 						if int(question_nbr) == 1:
 							reply = "Question number " + str(question_nbr) + " is: " + questions[question_nbr]
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
