@@ -53,3 +53,10 @@ clues = {
 	"3" : "It has sunk",
 	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
+# Poängavdrag för respektive ledtråd, exempel
+c_and_minus_points = {
+	"1" : 1,
+	"2" : 0,
+	"3" : 3,
+	"4" : 2
+}
