@@ -94,11 +94,12 @@ while True:
 						reply = "Question {} is closed since {}".format(clue_nbr, q_stop[clue_nbr])
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 					else:
-						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 						myteam.clues += 1
 						myteam.points -= c_and_minus_points[clue_nbr]
+						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
+						reply = reply + ". Deduction: " + str(c_and_minus_points[clue_nbr]) + ", Total: " + str(myteam.points)
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
 						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
 				elif "answer" in content:
 					question_nbr = content.split(" ")[1]
