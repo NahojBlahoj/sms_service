@@ -58,5 +58,15 @@ clues = {
 	"4" : "https://maps.app.goo.gl/rYEG9R6RWYzGAc9G9"
 }
 ```
+Minuspoäng för begärd ledtråd, exempel
+```
+c_and_minus_points = {
+	"1" : 1,
+	"2" : 0,
+	"3" : 3,
+	"4" : 2
+}
+```
+
 Exempel på konversation enligt reglerna ovan:
 <img width="709" alt="image" src="https://github.com/NahojBlahoj/sms_service/assets/94386854/c26757db-59da-4cce-ae44-bc540ed1ac40">

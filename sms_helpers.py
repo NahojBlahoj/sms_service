@@ -319,7 +319,13 @@ def get_top_three(avdelning):
 	retval = ""
 	try:
 		retval = retval +  "1: " + str(data[0][1]) + ". "
+	except:
+		pass
+	try:
 		retval = retval +  "2: " + str(data[1][1]) + ". "
+	except:
+		pass
+	try:
 		retval = retval +  "3: " + str(data[2][1]) + "."
 	except:
 		pass
