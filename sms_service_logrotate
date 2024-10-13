@@ -1,0 +1,11 @@
+/home/johan/logs/sms_service.log {
+	hourly
+	missingok
+	rotate 48
+	compress
+	create
+    postrotate
+		systemctl restart sms_service
+	endscript
+    
+}
