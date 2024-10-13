@@ -7,7 +7,7 @@ import locale
 
 import logging.handlers
 
-import competition
+import competition_mensa_midsommar as competition
 avdelningar = competition.avdelningar
 lagnamn = competition.lagnamn
 koder = competition.koder
@@ -31,6 +31,8 @@ def log_setup():
     logger.setLevel(logging.DEBUG)
 
 log_setup()
+sms_helpers.reset_modem()
+time.sleep(20)
 
 def check_sms_validity(id):
 	# Checks if an sms is valid
@@ -83,67 +85,80 @@ while True:
 
 				content = mysms.content.lower().split("#")[4]
 				if "clue" in content:
-					clue_nbr = content.split(" ")[1]
-					if int(clue_nbr) < 1 or int(clue_nbr) > int(list(clues.keys())[-1]):
-						reply = "No such clue"
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() < int(time.mktime(time.strptime(q_start[clue_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} opens at {}".format(clue_nbr, q_start[clue_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() > int(time.mktime(time.strptime(q_stop[clue_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} is closed since {}".format(clue_nbr, q_stop[clue_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					else:
-						myteam.clues += 1
-						myteam.points -= c_and_minus_points[clue_nbr]
-						reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
-						reply = reply + ". Deduction: " + str(c_and_minus_points[clue_nbr]) + ", Total: " + str(myteam.points)
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-						logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
-						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
-				elif "answer" in content:
-					question_nbr = content.split(" ")[1]
-					answer = content.split(" ")[2]
-					if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
-						reply = "No such question"
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif answer == q_and_a[question_nbr]:
-						if int(myteam.correct[int(question_nbr)]) > 0:
-							reply = "You have already answered question {}".format(question_nbr)
+					try:
+						clue_nbr = content.split(" ")[1]
+						if int(clue_nbr) < 1 or int(clue_nbr) > int(list(clues.keys())[-1]):
+							reply = "No such clue"
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() < int(time.mktime(time.strptime(q_start[clue_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} opens at {}".format(clue_nbr, q_start[clue_nbr])
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() > int(time.mktime(time.strptime(q_stop[clue_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} is closed since {}".format(clue_nbr, q_stop[clue_nbr])
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 						else:
-							myteam.points += q_and_points[question_nbr]
-							myteam.correct = myteam.correct[:int(question_nbr)] + "1" + myteam.correct[int(question_nbr)+1:] 
-							reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+							myteam.clues += 1
+							myteam.points -= c_and_minus_points[clue_nbr]
+							reply = "Clue " + str(clue_nbr) + " is: " + str(clues[clue_nbr])
+							reply = reply + ". Deduction: " + str(c_and_minus_points[clue_nbr]) + ", Total: " + str(myteam.points)
 							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-							logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
-					else:
-						logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
-						reply = "Wrong answer on question " + str(question_nbr)
+							logging.info("Lag " + str(namn) + " har fått ledtråd " + str(clue_nbr))
+							sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+					except:
+						reply = "Wrong format, please read instructions"
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+				elif "answer" in content:
+					try:
+						question_nbr = content.split(" ")[1]
+						answer = content.split(" ")[2]
+						logging.info("Got answer: " + str(answer))
+						if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
+							reply = "No such question"
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif answer == q_and_a[question_nbr]:
+							if int(myteam.correct[int(question_nbr)]) > 0:
+								reply = "You have already answered question {}".format(question_nbr)
+								sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+							else:
+								myteam.points += q_and_points[question_nbr]
+								myteam.correct = myteam.correct[:int(question_nbr)] + "1" + myteam.correct[int(question_nbr)+1:] 
+								reply = "Correct answer on question " + str(question_nbr) + "! Points: " + str(q_and_points[question_nbr]) + ", Total: " + str(myteam.points)
+								sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+								logging.info("Lag " + str(namn) + " har svarat rätt på fråga " + str(question_nbr) + " med svaret " + str(answer))
+						else:
+							logging.info("Lag " + str(namn) + " har svarat fel på fråga " + str(question_nbr) + " med svaret " + str(answer))
+							reply = "Wrong answer on question " + str(question_nbr)
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						sms_helpers.save_team_progress_to_db(myteam.namn, myteam.points, myteam.clues, myteam.correct)
+					except:
+						reply = "Wrong format, please read instructions"
+						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				elif "leaderboard" in content:
 					reply = sms_helpers.get_top_three(avdelning)
 					sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				elif "question" in content:
-					question_nbr = content.split(" ")[1]
-					if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
-						reply = "No such question"
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
-						reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
-						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
-					else:
-						reply = "Question number " + str(question_nbr) + " is: " + questions[question_nbr]
+					try:
+						question_nbr = content.split(" ")[1]
+						if int(question_nbr) < 1 or int(question_nbr) > int(list(q_and_a.keys())[-1]):
+							reply = "No such question"
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() < int(time.mktime(time.strptime(q_start[question_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} opens at {}".format(question_nbr, q_start[question_nbr])
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						elif int(time.time() > int(time.mktime(time.strptime(q_stop[question_nbr],"%Y-%m-%d %H:%M")))):
+							reply = "Question {} is closed since {}".format(question_nbr, q_stop[question_nbr])
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+						else:
+							reply = "Question number " + str(question_nbr) + " is: " + questions[question_nbr]
+							sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
+					except:
+						reply = "Wrong format, please read instructions"
 						sms_helpers.send_sms(mysms.number, reply.encode("utf-8"))
 				else:
 					# Felformaterat men giltigt SMS

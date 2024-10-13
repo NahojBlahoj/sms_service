@@ -1,0 +1,10 @@
+[Unit]
+Description=SMS service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/johan/code/sms_service/sms_service.py
+Restart=on-failure
+RestartSec=10s
+User=johan
